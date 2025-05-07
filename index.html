@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Analysis: YouTube Premium BD</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+     <!-- Bootstrap Icons -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #ff0000; /* YouTube Red theme */
+            --secondary-color: #ffebee;
+            --text-color: #333;
+            --bg-color: #fadde1;
+            --card-bg: #fff;
+            --card-header-bg: var(--primary-color);
+            --card-header-color: white;
+            --border-color: #ffcdd2;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 20px;
+            padding-bottom: 40px; /* Added padding */
+        }
+        .container {
+            max-width: 1200px; /* Standard max-width for desktop */
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+         }
+
+        .card-header {
+            background-color: var(--card-header-bg);
+            color: var(--card-header-color);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            padding: 1rem 1.5rem; /* Increased padding */
+            font-size: 1.25rem; /* Larger font */
+        }
+         h1, h2 {
+             color: var(--primary-color); /* Use primary color for headings */
+         }
+         .card-header h2 {
+              color: var(--card-header-color); /* White color for card header h2 */
+         }
+
+
+        .market-viewer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .market-viewer-item:last-child {
+            border-bottom: none;
+        }
+        .market-viewer-item a {
+            flex-grow: 1;
+            margin-right: 10px;
+            word-break: break-all; /* Ensures long links wrap */
+            color: var(--primary-color); /* Link color */
+             text-decoration: none;
+        }
+        .market-viewer-item a:hover {
+             text-decoration: underline;
+        }
+         .copy-btn {
+             flex-shrink: 0; /* Prevent button from shrinking */
+         }
+
+        .iframe-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            margin-bottom: 20px;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #ccc;
+             background-color: white; /* Ensure iframe background is not transparent */
+        }
+
+        .editable {
+            cursor: pointer;
+            padding: 5px; /* Add padding for better click area */
+            border-radius: 3px;
+             transition: background-color 0.2s ease; /* Smooth transition for hover */
+        }
+         .editable:hover {
+             background-color: var(--secondary-color); /* Hover effect */
+         }
+         .editable:focus {
+             outline: none; /* Remove default outline */
+             box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25); /* YouTube Red focus ring */
+             background-color: white; /* White background when editing */
+         }
+         td.editable.editing {
+             background-color: white; /* Explicitly white when active editing */
+         }
+
+         .table th, .table td {
+           vertical-align: middle;
+           padding: 0.75rem; /* Bootstrap default padding */
+           border-color: var(--border-color);
+        }
+        .table th {
+            background-color: var(--secondary-color); /* Header background */
+            cursor: pointer; /* Indicate sortable */
+         }
+          .table th:hover {
+              background-color: #e0e0e0; /* Darker hover for sortable */
+          }
+          .table th .bi {
+              margin-left: 5px; /* Space for sort icons */
+              font-size: 0.8em;
+          }
+
+
+         /* Animation for added rows */
+        .table-row-add {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+         /* Animation for removed rows (requires JS to add class before removing) */
+        .table-row-remove {
+             animation: fadeOut 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Style for profit/loss */
+        .text-success { color: #198754 !important; } /* Bootstrap success (Green) */
+        .text-danger { color: #dc3545 !important; } /* Bootstrap danger (Red) */
+        .text-warning { color: #ffc107 !important; } /* Bootstrap warning (Orange) */
+
+         /* Style for total profit */
+         #total-profit-area {
+             font-size: 1.2rem;
+             font-weight: bold;
+             margin-top: 15px;
+             padding: 10px;
+             border: 1px solid var(--border-color);
+             border-radius: 5px;
+             background-color: var(--secondary-color);
+         }
+
+         #final-result-output, #notepad-textarea {
+             width: 100%;
+             font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Monospaced font for readability */
+             font-size: 0.9rem;
+             padding: 10px;
+             border-color: var(--border-color);
+             border-radius: 5px;
+             resize: vertical; /* Allow vertical resizing */
+              min-height: 100px; /* Minimum height for textareas */
+         }
+         #final-result-output { height: 200px; } /* Specific height for result list */
+         #notepad-textarea { height: 200px; } /* Specific height for notepad */
+
+         /* Dynamic table height with scroll */
+         .table-container-scroll {
+             max-height: 400px; /* Adjust as needed */
+             overflow-y: auto; /* Add vertical scrollbar */
+             margin-bottom: 15px; /* Space below table */
+         }
+          .table-container-scroll table {
+               margin-bottom: 0 !important; /* Remove table bottom margin inside container */
+          }
+
+
+         /* Button Color adjustments for YouTube theme */
+         .btn-primary, .btn-success, .btn-danger {
+             --bs-btn-bg: var(--primary-color); /* Use Primary Color (YouTube Red) */
+             --bs-btn-border-color: var(--primary-color);
+             --bs-btn-hover-bg: #cc0000; /* Darker shade */
+             --bs-btn-hover-border-color: #b30000;
+             --bs-btn-focus-shadow-rgb: 255, 0, 0;
+             --bs-btn-active-bg: #b30000;
+             --bs-btn-active-border-color: #990000;
+         }
+         .btn-outline-primary {
+             --bs-btn-color: var(--primary-color); /* Use Primary Color */
+             --bs-btn-border-color: var(--primary-color);
+             --bs-btn-hover-color: #fff;
+             --bs-btn-hover-bg: var(--primary-color);
+             --bs-btn-hover-border-color: var(--primary-color);
+             --bs-btn-active-color: #fff;
+             --bs-btn-active-bg: #cc0000;
+             --bs-btn-active-border-color: #b30000;
+             --bs-btn-disabled-color: var(--primary-color);
+             --bs-btn-disabled-border-color: var(--primary-color);
+         }
+          .btn-outline-danger {
+              --bs-btn-color: #dc3545; /* Keep standard red for danger/delete */
+              --bs-btn-border-color: #dc3545;
+              --bs-btn-hover-color: #fff;
+              --bs-btn-hover-bg: #dc3545;
+              --bs-btn-hover-border-color: #dc3545;
+          }
+           /* Ensure Add Data button is success green if needed */
+         .btn-success {
+              --bs-btn-bg: #198754; /* Bootstrap success */
+              --bs-btn-border-color: #198754;
+              --bs-btn-hover-bg: #157347;
+              --bs-btn-hover-border-color: #146c43;
+              --bs-btn-active-bg: #13653f;
+              --bs-btn-active-border-color: #125f3b;
+              --bs-btn-disabled-bg: #198754;
+              --bs-btn-disabled-border-color: #198754;
+          }
+
+
+         /* Calculator Styles */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            max-width: 300px; /* Keep calculator compact */
+            margin: 0 auto; /* Center the calculator */
+            padding: 10px; /* Add padding inside card body */
+            background-color: #eee; /* Light background for calculator area */
+            border-radius: 5px;
+        }
+
+        .calculator-display {
+            grid-column: span 4;
+            background-color: #222;
+            color: white;
+            text-align: end;
+            padding: 10px;
+            font-size: 2em;
+            overflow: hidden;
+            border-radius: 5px;
+            word-break: break-all; /* Prevent overflow */
+             min-height: 1.5em; /* Ensure minimum height */
+        }
+
+        .calculator-grid button {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #fff; /* White buttons */
+            transition: background-color 0.1s ease;
+        }
+
+        .calculator-grid button:hover {
+            background-color: #d5d5d5;
+        }
+
+        .calculator-grid button.operator {
+            background-color: #ff9800; /* Orange */
+            color: white;
+        }
+         .calculator-grid button.operator:hover {
+             background-color: #f57c00; /* Darker Orange */
+         }
+
+        .calculator-grid button.equals {
+            background-color: #4caf50; /* Green */
+            color: white;
+            grid-column: span 2; /* Make equals button wider */
+        }
+         .calculator-grid button.equals:hover {
+             background-color: #388e3c; /* Darker Green */
+         }
+
+         .calculator-grid button.clear,
+         .calculator-grid button.all-clear {
+             background-color: #f44336; /* Red */
+             color: white;
+         }
+          .calculator-grid button.clear:hover,
+          .calculator-grid button.all-clear:hover {
+              background-color: #d32f2f; /* Darker Red */
+          }
+          .calculator-grid button.all-clear {
+               grid-column: span 2; /* Make AC button wider */
+          }
+
+
+        /* Print Styles - Print all visible content */
+        @media print {
+             /* Hide non-essential UI elements during print */
+             #reset-data-btn, #print-data-btn, .table-actions,
+             #copy-feedback, form, .input-group,
+             .btn, .form-label, .alert, #search-input-group,
+             .table th .bi { /* Hide sort icons in print */
+                 display: none !important;
+             }
+
+             /* Ensure editable cells don't look like inputs in print */
+             .editable {
+                 border: none !important;
+                 cursor: default !important;
+                 background-color: transparent !important;
+                 padding: 0.75rem !important; /* Revert to standard cell padding */
+                 box-shadow: none !important;
+             }
+
+              /* Ensure cards and their content are not broken across pages */
+             .card, .card-body, .table-responsive, .row {
+                  page-break-inside: avoid;
+                  break-inside: avoid;
+                  /* Add some space after each card to prevent merging */
+                  margin-bottom: 15px !important;
+             }
+
+              /* Table specific print styles */
+             table {
+                 border-collapse: collapse !important;
+                 width: 100% !important;
+                 margin-bottom: 0 !important; /* Remove table margin */
+             }
+             th, td {
+                 border: 1px solid #ccc !important;
+                 padding: 8px !important;
+                 background-color: white !important;
+                 color: #000 !important; /* Ensure black text */
+                 box-shadow: none !important;
+                 text-align: left !important;
+             }
+             thead th {
+                 background-color: #eee !important; /* Light header background */
+             }
+              /* Override Bootstrap striped table background for print */
+            .table-striped tbody tr:nth-of-type(odd) > * {
+                 background-color: #f9f9f9 !important; /* Light stripe background */
+            }
+
+
+             /* Style specific sections for print */
+             /* Headers */
+             h1, h2 {
+                 color: #000 !important; /* Print headings in black */
+                 page-break-after: avoid; /* Try to keep heading with its content */
+             }
+             p {
+                 page-break-after: avoid;
+             }
+             /* Iframe - may or may not print content depending on source */
+             .iframe-container {
+                 /* Ensure iframe container takes up space */
+                 padding-top: 0 !important; /* Remove aspect ratio padding for print */
+                  height: 400px !important; /* Give it a fixed height for print */
+                  overflow: hidden !important; /* Hide scrollbars if needed */
+                  border: 1px solid #ccc !important; /* Add border for clarity */
+             }
+             .iframe-container iframe {
+                  position: static !important; /* Revert position for print flow */
+                  width: 100% !important;
+                  height: 100% !important;
+                  border: none !important; /* Border is on container */
+             }
+
+             /* Calculator display - ensure visibility and styling */
+             .calculator-grid {
+                  /* Reset grid for print */
+                  display: grid !important; /* Keep grid for layout */
+                  grid-template-columns: repeat(4, 1fr) !important; /* Keep columns */
+                   grid-gap: 5px !important; /* Smaller gap */
+                  max-width: 300px !important; /* Keep compact */
+                  margin: 10px auto !important; /* Add margin */
+                  padding: 5px !important;
+                  background-color: #eee !important; /* Light background */
+                  border: 1px solid #ccc !important; /* Add border */
+             }
+              /* Only print the display */
+             .calculator-display {
+                 background-color: #eee !important; /* Lighter background for print */
+                 color: #000 !important; /* Black text */
+                 border: 1px solid #ccc !important;
+                 grid-column: span 4 !important;
+                 padding: 5px !important;
+                 font-size: 1.5em !important; /* Smaller font for print */
+             }
+              .calculator-grid button {
+                  /* Hide calculator buttons in print */
+                  display: none !important;
+              }
+
+
+             /* Notepad and Final List textareas - ensure borders and content */
+             #notepad-textarea, #final-result-output {
+                  border: 1px solid #ccc !important;
+                  background-color: #fff !important;
+                  color: #000 !important;
+                  resize: none !important; /* Disable resizing in print */
+                  height: auto !important; /* Let height be determined by content */
+                  overflow: visible !important; /* Ensure all text is visible */
+                  white-space: pre-wrap !important; /* Respect line breaks */
+                  min-height: 80px !important; /* Smaller min height for print */
+             }
+
+             /* Total Profit Area */
+              #total-profit-area {
+                  border: 1px solid #ccc !important; /* Add border for print */
+                  background-color: #eee !important; /* Add background for print */
+                  font-size: 1em !important; /* Smaller font for print */
+                  font-weight: bold !important; /* Keep bold */
+                  padding: 5px !important; /* Smaller padding */
+                  margin-top: 10px !important;
+                  text-align: right !important;
+                  color: #000 !important; /* Black text */
+              }
+              #total-profit-area span { /* Ensure profit span color is removed */
+                   color: #000 !important;
+              }
+
+              /* Ensure main container takes full width if needed, though Bootstrap handles this */
+             .container {
+                  width: 100% !important;
+                  max-width: none !important;
+                  padding: 0 !important; /* Remove container padding */
+             }
+             body {
+                 padding-top: 0 !important;
+                 padding-bottom: 0 !important;
+             }
+
+
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-center my-4">Market Analysis Tool</h1>
+        <p class="text-center text-muted">Product: YouTube Premium BD</p>
+
+        <!-- Action Buttons (Reset & Print & Export) -->
+        <div class="row mb-3">
+             <div class="col-md-4 mb-2 mb-md-0">
+                  <button class="btn btn-outline-danger w-100" id="reset-data-btn">
+                     <i class="bi bi-trash"></i> Reset All Analysis Data
+                  </button>
+             </div>
+              <div class="col-md-4 mb-2 mb-md-0">
+                 <button class="btn btn-outline-primary w-100" id="print-data-btn">
+                    <i class="bi bi-printer"></i> Print All Data
+                 </button>
+              </div>
+              <div class="col-md-4">
+                 <button class="btn btn-outline-primary w-100" id="export-csv-btn">
+                    <i class="bi bi-filetype-csv"></i> Export as CSV
+                 </button>
+              </div>
+        </div>
+
+
+        <!-- Market Viewer Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Market Viewer (Competitors)</h2>
+            </div>
+            <div class="card-body">
+                <p>Here are some competitor websites for YouTube Premium services in Bangladesh. Click the copy button to quickly copy their URL.</p>
+                <div id="competitor-list">
+                    <!-- Example Competitors (Replace with actual links) -->
+                    <div class="market-viewer-item">
+                        <a href="https://example.com/youtube-competitor1" target="_blank">Example YouTube Site 1</a>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-url="https://example.com/youtube-competitor1"><i class="bi bi-copy"></i> Copy</button>
+                    </div>
+                     <div class="market-viewer-item">
+                        <a href="https://example.com/youtube-competitor2" target="_blank">Example YouTube Site 2</a>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-url="https://example.com/youtube-competitor2"><i class="bi bi-copy"></i> Copy</button>
+                    </div>
+                     <div class="market-viewer-item">
+                        <a href="https://example.com/youtube-competitor3" target="_blank">Example YouTube Site 3</a>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-url="https://example.com/youtube-competitor3"><i class="bi bi-copy"></i> Copy</button>
+                    </div>
+                    <!-- Add more competitors as needed -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Web Iframe Viewer Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Web Iframe Viewer</h2>
+            </div>
+            <div class="card-body">
+                <p>Enter a website URL below to view it directly within this page. This can be useful for quick comparisons.</p>
+                <div class="input-group mb-3">
+                    <input type="url" id="iframe-url-input" class="form-control" placeholder="Enter website URL (e.g., https://example.com)">
+                    <button class="btn btn-primary" type="button" id="load-iframe-btn"><i class="bi bi-globe"></i> Load Website</button>
+                </div>
+                <div class="iframe-container">
+                     <iframe id="website-iframe" src="" title="Website Viewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe> <!-- Added sandbox for basic security -->
+                </div>
+                <div class="alert alert-info" role="alert">
+                   Note: Some websites may block being displayed in an iframe due to security policies (X-Frame-Options).
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculator and Notepad Section -->
+         <div class="row">
+             <!-- Calculator Card -->
+             <div class="col-md-6">
+                 <div class="card">
+                     <div class="card-header">
+                         <h2>Calculator</h2>
+                     </div>
+                     <div class="card-body">
+                         <div class="calculator-grid">
+                             <div class="calculator-display" id="calc-display">0</div>
+                             <button class="all-clear" id="calc-all-clear">AC</button>
+                             <button class="clear" id="calc-clear">C</button>
+                             <button class="operator" data-operator="/">÷</button>
+                             <button data-number="7">7</button>
+                             <button data-number="8">8</button>
+                             <button data-number="9">9</button>
+                             <button class="operator" data-operator="*">×</button>
+                             <button data-number="4">4</button>
+                             <button data-number="5">5</button>
+                             <button data-number="6">6</button>
+                             <button class="operator" data-operator="-">-</button>
+                             <button data-number="1">1</button>
+                             <button data-number="2">2</button>
+                             <button data-number="3">3</button>
+                             <button class="operator" data-operator="+">+</button>
+                             <button data-number="0">0</button>
+                             <button data-decimal=".">.</button>
+                             <button class="equals" id="calc-equals">=</button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Notepad Card -->
+             <div class="col-md-6">
+                  <div class="card">
+                      <div class="card-header">
+                          <h2>Notepad</h2>
+                      </div>
+                      <div class="card-body">
+                           <p>Use this notepad for quick notes. Content is saved automatically in your browser.</p>
+                          <textarea id="notepad-textarea" class="form-control" placeholder="Type your notes here..."></textarea>
+                           <div class="text-end mt-2">
+                                <button class="btn btn-outline-danger btn-sm" id="clear-notepad-btn">
+                                     <i class="bi bi-trash"></i> Clear Notepad
+                                </button>
+                           </div>
+
+                      </div>
+                  </div>
+             </div>
+         </div>
+
+
+        <!-- Data Input Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Add Product Data</h2>
+            </div>
+            <div class="card-body">
+                 <p>Enter the details for a product to calculate potential profit based on Buy Rate.</p>
+                <form id="product-data-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="item-name-input" class="form-label">Item Name:</label>
+                            <input type="text" class="form-control" id="item-name-input" required placeholder="e.g., 1 Month Family Plan">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="buy-rate-input" class="form-label">Buy Rate (৳):</label>
+                            <input type="number" class="form-control" id="buy-rate-input" step="0.01" min="0" required placeholder="e.g., 150">
+                        </div>
+                         <!-- Sell Rate will be initially calculated/displayed in the output table and can be edited there -->
+                    </div>
+                    <button type="submit" class="btn btn-success mt-3"><i class="bi bi-plus-circle"></i> Add Data</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Data Output Section -->
+        <div class="card">
+             <div class="card-header">
+                <h2>Product Analysis Data</h2>
+             </div>
+            <div class="card-body">
+                <!-- Search Input -->
+                 <div class="input-group mb-3" id="search-input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="search-input" placeholder="Search by Item Name">
+                 </div>
+
+                <p>Here is the data you've added. Double-click on 'Item Name', 'Buy Rate', or 'Your Selling Price' cells in the table to edit them directly.</p>
+
+                <!-- Table Container with Scroll -->
+                <div class="table-container-scroll">
+                    <table class="table table-striped table-hover" id="data-output-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="serial">Serial No. <i class="bi bi-sort-alpha-down"></i></th>
+                                <th data-sort="itemName">Item Name <i class="bi bi-sort-alpha-down"></i></th>
+                                <th data-sort="buyRate">Buy Rate (৳) <i class="bi bi-sort-alpha-down"></i></th>
+                                <th data-sort="calculatedTargetSell">Calculated Target Sell (৳) <i class="bi bi-sort-alpha-down"></i></th> <!-- Suggestion based on pattern -->
+                                <th data-sort="sellRate">Your Selling Price (৳) <i class="bi bi-sort-alpha-down"></i></th>   <!-- This is the editable price -->
+                                <th data-sort="profit">Profit (৳) <i class="bi bi-sort-numeric-down"></i></th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data rows will be added here by JavaScript -->
+                            <tr id="no-data-row">
+                                <td colspan="7" class="text-center text-muted">No data added yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div> <!-- End table-container-scroll -->
+
+
+                <div id="total-profit-area" class="text-end">
+                    Total Profit: <span id="total-profit-value">0.00 ৳</span>
+                </div>
+
+
+                 <div class="alert alert-info mt-3" role="alert">
+                    <strong>Sell Rate Calculation Pattern:</strong>
+                    <ul>
+                        <li>Base: Buy Rate + 5% Profit</li>
+                        <li>If Buy Rate > 500: Add ৳5 extra</li>
+                        <li>If Buy Rate > 1000: Add ৳10 extra (instead of ৳5)</li>
+                         <li><strong>Rounding:</strong> The final calculated value is rounded UP to the nearest multiple of 5.</li>
+                         <li>Profit = Your Selling Price - Buy Rate.</li>
+                    </ul>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Final Result Section -->
+         <div class="card">
+             <div class="card-header">
+                 <h2>Final Selling Prices List (for Facebook/Posting)</h2>
+             </div>
+             <div class="card-body">
+                 <p>This list shows "Item Name - Your Selling Price" formatted for easy copying to social media like Facebook.</p>
+                 <div class="alert alert-secondary" role="alert">
+                      Format: 💎 Item Name - Price Tk
+                 </div>
+                 <textarea id="final-result-output" readonly class="form-control mb-3" placeholder="Your list will appear here..."></textarea>
+                 <button class="btn btn-primary" id="copy-result-btn"><i class="bi bi-clipboard"></i> Copy List</button>
+                 <span id="copy-feedback" class="ms-3 text-success" style="display: none;"><i class="bi bi-check-lg"></i> Copied!</span>
+             </div>
+         </div>
+
+
+    </div> <!-- End Container -->
+
+    <!-- Bootstrap JS Bundle (popper.js and bootstrap.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DOM Elements ---
+            const competitorList = document.getElementById('competitor-list');
+            const iframeUrlInput = document.getElementById('iframe-url-input');
+            const loadIframeBtn = document.getElementById('load-iframe-btn');
+            const websiteIframe = document.getElementById('website-iframe');
+            const productDataForm = document.getElementById('product-data-form');
+            const itemNameInput = document.getElementById('item-name-input');
+            const buyRateInput = document.getElementById('buy-rate-input');
+            const dataOutputTableBody = document.querySelector('#data-output-table tbody');
+            const noDataRow = document.getElementById('no-data-row');
+            const totalProfitValueSpan = document.getElementById('total-profit-value');
+            const finalResultOutput = document.getElementById('final-result-output');
+            const copyResultBtn = document.getElementById('copy-result-btn');
+            const copyFeedbackSpan = document.getElementById('copy-feedback');
+            const resetDataBtn = document.getElementById('reset-data-btn');
+            const printDataBtn = document.getElementById('print-data-btn'); // Print button
+            const searchInput = document.getElementById('search-input'); // Search Input
+            const exportCsvBtn = document.getElementById('export-csv-btn'); // Export CSV Button
+            const tableHeaders = document.querySelectorAll('#data-output-table th[data-sort]'); // Sortable headers
+
+
+            // Calculator Elements
+            const calcDisplay = document.getElementById('calc-display');
+            const calcButtons = document.querySelectorAll('.calculator-grid button');
+            const calcAllClearBtn = document.getElementById('calc-all-clear');
+            const calcClearBtn = document.getElementById('calc-clear');
+            const calcEqualsBtn = document.getElementById('calc-equals');
+
+            // Notepad Elements
+            const notepadTextarea = document.getElementById('notepad-textarea');
+            const clearNotepadBtn = document.getElementById('clear-notepad-btn');
+
+
+            // --- Data Storage Keys (Changed for YouTube Premium) ---
+            const productDataStorageKey = 'productDataYouTubePremiumBD'; // Unique Key for Analysis Data
+            const notepadStorageKey = 'notepadContentYouTubePremiumBD'; // Unique Key for Notepad
+
+
+            // --- Data ---
+            let productData = []; // Holds the analysis data
+            let currentSortColumn = 'serial'; // Default sort column
+            let currentSortDirection = 'asc'; // 'asc' or 'desc'
+
+
+            // --- Functions ---
+
+             // --- Calculator Functions ---
+            function updateCalcDisplay() {
+                // Prevent showing too many decimals or scientific notation for large numbers
+                 const displayValue = String(currentInput);
+                 if (displayValue.includes('.') && displayValue.length > 15) {
+                     // Simple truncation or rounding for display if too long and has decimal
+                      calcDisplay.textContent = parseFloat(displayValue).toFixed(10).substring(0, 15) + '...'; // Truncate and indicate more exists
+                 } else if (displayValue.length > 15) {
+                      // For very long integers, just show as is, might overflow display slightly
+                      calcDisplay.textContent = displayValue.substring(0, 15) + '...';
+                 }
+                 else {
+                      calcDisplay.textContent = displayValue;
+                 }
+
+            }
+
+            function resetCalculator() {
+                 currentInput = '0';
+                 firstOperand = null;
+                 operator = null;
+                 waitingForSecondOperand = false;
+                 updateCalcDisplay();
+            }
+
+             function clearLastInput() {
+                 if (currentInput === 'Error') { // If display shows error, 'C' button acts like 'AC'
+                      resetCalculator();
+                      return;
+                 }
+                 if (waitingForSecondOperand) {
+                      // If we just pressed an operator and haven't typed the second number, 'C' clears the operator intent
+                       operator = null;
+                       waitingForSecondOperand = false;
+                       // Keep the first operand visible, don't change currentInput
+                       updateCalcDisplay(); // Update display just in case internal state changed display format
+                      return;
+                 }
+                // If we are typing the current number
+                 currentInput = currentInput.slice(0, -1) || '0'; // Remove last character, default to '0' if empty
+                 updateCalcDisplay();
+             }
+
+
+            function handleNumber(number) {
+                 // If display is 'Error', reset before typing
+                 if (currentInput === 'Error') {
+                     resetCalculator();
+                 }
+
+                 if (currentInput.length >= 15 && !waitingForSecondOperand) { // Limit input length unless starting a new number
+                    return;
+                 }
+
+                if (waitingForSecondOperand === true) {
+                    currentInput = number;
+                    waitingForSecondOperand = false;
+                } else {
+                     // Prevent multiple leading zeros (e.g., 007 -> 7, but 0.5 is fine)
+                    if (currentInput === '0' && number === '0') return; // Don't add '0' if already '0'
+                     if (currentInput === '0' && number !== '0' && number !== '.') { // Replace '0' with the first non-zero digit
+                        currentInput = number;
+                    } else {
+                       currentInput += number;
+                    }
+                }
+                updateCalcDisplay();
+            }
+
+            function handleDecimal(dot) {
+                 // If display is 'Error', reset before typing
+                 if (currentInput === 'Error') {
+                     resetCalculator();
+                 }
+
+                 if (waitingForSecondOperand === true) {
+                      currentInput = '0.'
+                      waitingForSecondOperand = false;
+                      updateCalcDisplay();
+                      return;
+                 }
+                // If the current input already contains a decimal point, do nothing
+                if (!currentInput.includes(dot)) {
+                    currentInput += dot;
+                }
+                 updateCalcDisplay();
+            }
+
+            function handleOperator(nextOperator) {
+                 // If display is 'Error', cannot use operator
+                 if (currentInput === 'Error') {
+                     operator = null; // Ensure operator state is clear
+                      return;
+                 }
+
+                const inputValue = parseFloat(currentInput);
+
+                if (operator && waitingForSecondOperand) {
+                    // If an operator is pressed consecutively, update the operator
+                    operator = nextOperator;
+                    // console.log('Operator changed to:', operator); // Debugging
+                    return;
+                }
+
+                 // Check if inputValue is a valid number
+                 if (isNaN(inputValue)) {
+                      // Cannot perform operation with non-numeric input
+                     currentInput = 'Error';
+                     operator = null;
+                     firstOperand = null;
+                     waitingForSecondOperand = false;
+                     updateCalcDisplay();
+                     return;
+                 }
+
+
+                if (firstOperand === null) {
+                    // Store the first operand if it's not already set
+                    firstOperand = inputValue;
+                } else if (operator) {
+                    // If an operator exists, perform the calculation
+                    const result = performCalculation[operator](firstOperand, inputValue);
+
+                    if (result === 'Error' || !isFinite(result)) { // Handle division by zero or other errors
+                         currentInput = 'Error';
+                         firstOperand = null;
+                         operator = null;
+                         waitingForSecondOperand = false;
+                         updateCalcDisplay();
+                         console.error("Calculation Error:", result);
+                         return; // Stop execution after error
+                    }
+
+                    currentInput = String(result); // Use String to handle potentially large numbers or decimals
+                    firstOperand = result; // Chain the result
+                }
+
+                waitingForSecondOperand = true; // Prepare for the next operand
+                operator = nextOperator; // Store the operator
+
+                 // Optional: Show the result of chained operation on display immediately
+                 // updateCalcDisplay(); // Already called inside the calculation block
+
+                // console.log('Operator:', operator, 'First Operand:', firstOperand); // Debugging
+            }
+
+             const performCalculation = {
+                 '/': (firstOperand, secondOperand) => {
+                      if (secondOperand === 0) return 'Error'; // Division by zero
+                      return firstOperand / secondOperand;
+                 },
+                 '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
+                 '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+                 '-': (firstOperand, secondOperand) => firstOperand - secondOperand,
+             };
+
+            function handleEquals() {
+                 // If display is 'Error' or already equals, do nothing
+                 if (currentInput === 'Error' || operator === null || waitingForSecondOperand) {
+                    return;
+                }
+
+                const inputValue = parseFloat(currentInput);
+
+                 if (isNaN(inputValue)) { // Handle cases like "5 +" then "="
+                      currentInput = 'Error';
+                 } else {
+                      const result = performCalculation[operator](firstOperand, inputValue);
+
+                      if (result === 'Error' || !isFinite(result)) { // Handle errors again
+                           currentInput = 'Error';
+                      } else {
+                         currentInput = String(result); // Final result display
+                      }
+                 }
+
+                firstOperand = null; // Reset for a new calculation
+                operator = null; // Reset operator
+                waitingForSecondOperand = true; // Next number input should clear display
+
+                updateCalcDisplay();
+                 // console.log('Equals. Result:', currentInput); // Debugging
+            }
+
+            // --- Notepad Functions ---
+            function loadNotepad() {
+                const savedContent = localStorage.getItem(notepadStorageKey);
+                if (savedContent !== null) { // Check for null, as empty string is valid content
+                    notepadTextarea.value = savedContent;
+                } else {
+                     notepadTextarea.value = ''; // Clear if no saved content
+                }
+            }
+
+            function saveNotepad() {
+                localStorage.setItem(notepadStorageKey, notepadTextarea.value);
+                // console.log("Notepad saved."); // Debugging/Feedback
+            }
+
+            function clearNotepad() {
+                 if (confirm('Are you sure you want to clear the notepad?')) {
+                    notepadTextarea.value = '';
+                    localStorage.removeItem(notepadStorageKey);
+                     // console.log("Notepad cleared."); // Debugging/Feedback
+                 }
+            }
+
+
+            // --- Data Analysis Functions ---
+
+            // Function to calculate Target Sell Rate based on the specified pattern AND round up to nearest 5
+            function calculateTargetSell(buyRate) {
+                const rate = parseFloat(buyRate);
+                if (isNaN(rate) || rate < 0) {
+                    return 0;
+                }
+
+                let baseProfit = rate * 0.05; // 5% base profit
+                let bonus = 0;
+
+                if (rate > 500) {
+                    bonus = 5; // Add 5 Taka extra if > 500
+                }
+                if (rate > 1000) {
+                    bonus = 10; // Add 10 Taka extra if > 1000 (overrides the 5 Taka if applicable)
+                }
+
+                const calculatedValue = rate + baseProfit + bonus;
+
+                if (calculatedValue <= 0) return 0;
+
+                const roundedValue = Math.ceil(calculatedValue / 5) * 5;
+
+                return roundedValue;
+            }
+
+            // Function to calculate Profit (Sell Rate - Buy Rate)
+            function calculateProfit(buyRate, sellRate) {
+                 const buy = parseFloat(buyRate);
+                 const sell = parseFloat(sellRate);
+                 if (isNaN(buy) || isNaN(sell)) {
+                     console.warn("Invalid numeric input for profit calculation:", buyRate, sellRate); // Warn for invalid inputs
+                     return 0; // Return 0 for non-numeric inputs
+                 }
+                 const profit = sell - buy;
+                 return parseFloat(profit.toFixed(2)); // Return profit rounded to 2 decimal places
+            }
+
+             // Function to format profit cell with color
+            function formatProfitCell(profit) {
+                const profitValue = parseFloat(profit);
+                if (isNaN(profitValue)) return `<span class="text-muted">N/A</span>`;
+
+                let className = 'text-muted'; // Default
+                let displayValue = profitValue.toFixed(2) + ' ৳'; // Format with Taka sign and 2 decimals
+
+                if (profitValue > 0) {
+                    className = 'text-success'; // Green for profit
+                } else if (profitValue < 0) {
+                    className = 'text-danger'; // Red for loss
+                } else {
+                    className = 'text-warning'; // Orange for zero profit
+                }
+                 return `<span class="${className}">${displayValue}</span>`;
+            }
+
+             // Function to calculate total profit
+            function calculateTotalProfit() {
+                const total = productData.reduce((sum, product) => {
+                    // Ensure product.profit is a valid number before adding
+                    const profit = parseFloat(product.profit);
+                    return sum + (isNaN(profit) ? 0 : profit);
+                }, 0);
+
+                 const formattedTotal = total.toFixed(2) + ' ৳';
+                totalProfitValueSpan.textContent = formattedTotal;
+
+                 // Optional: Color the total profit text based on value
+                 if (total > 0) {
+                      totalProfitValueSpan.classList.remove('text-danger', 'text-warning');
+                      totalProfitValueSpan.classList.add('text-success');
+                 } else if (total < 0) {
+                      totalProfitValueSpan.classList.remove('text-success', 'text-warning');
+                      totalProfitValueSpan.classList.add('text-danger');
+                 } else {
+                      totalProfitValueSpan.classList.remove('text-success', 'text-danger');
+                      totalProfitValueSpan.classList.add('text-warning');
+                 }
+            }
+
+            // Function to generate and display the final result list (Facebook format)
+            function updateFinalResultList() {
+                 const stylishSign = "💎 "; // Stylish Sign/Emoji for list items
+
+                 const listItems = productData.map(product => {
+                     const itemName = product.itemName || 'Unnamed Item';
+                     const sellRate = parseFloat(product.sellRate); // Use the editable sellRate
+
+                     let formattedSellRate;
+                     if (isNaN(sellRate)) {
+                         formattedSellRate = 'N/A'; // Handle non-numeric sell rate
+                     } else {
+                         // Round to nearest whole number (no paisha)
+                         const roundedSellRate = Math.round(sellRate);
+                         // Add " Tk" instead of ৳ or Taka text
+                         formattedSellRate = `${roundedSellRate} Tk`;
+                     }
+
+                     // Combine with the stylish sign and item name
+                     return `${stylishSign}${itemName} - ${formattedSellRate}`;
+                 });
+
+                 // Join lines with newline character for the textarea
+                 finalResultOutput.value = listItems.join('\n');
+            }
+
+            // Function to sort the productData array
+             function sortTable(column, direction) {
+                 productData.sort((a, b) => {
+                      let aValue = a[column];
+                      let bValue = b[column];
+
+                      // Special handling for numeric columns
+                     if (column === 'buyRate' || column === 'calculatedTargetSell' || column === 'sellRate' || column === 'profit') {
+                          aValue = parseFloat(aValue) || 0; // Treat non-numbers as 0 for sorting
+                          bValue = parseFloat(bValue) || 0;
+                     } else if (column === 'itemName') {
+                         // Case-insensitive string comparison for Item Name
+                          aValue = String(aValue).toLowerCase();
+                          bValue = String(bValue).toLowerCase();
+                     } else if (column === 'serial') {
+                          aValue = parseInt(aValue) || 0;
+                          bValue = parseInt(bValue) || 0;
+                     }
+
+
+                      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+                      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+                      return 0; // Values are equal
+                 });
+
+                 // After sorting the data, re-render the table to update the UI
+                 // The renderTable function automatically handles serial numbers based on the new order.
+                 renderTable();
+             }
+
+             // Function to update sort icons in the table header
+             function updateSortIcons(sortedColumn, sortedDirection) {
+                 tableHeaders.forEach(header => {
+                      const column = header.getAttribute('data-sort');
+                      const icon = header.querySelector('.bi'); // Assuming icon is always the Bootstrap Icon
+
+                      // Reset all icons
+                      icon.classList.remove('bi-sort-alpha-down', 'bi-sort-alpha-up', 'bi-sort-numeric-down', 'bi-sort-numeric-up');
+
+                      if (column === sortedColumn) {
+                           // Set icon for the currently sorted column
+                           let iconClass = 'bi-sort-alpha-down'; // Default for alpha/serial
+                           if (column === 'buyRate' || column === 'calculatedTargetSell' || column === 'sellRate' || column === 'profit' || column === 'serial') {
+                                iconClass = sortedDirection === 'asc' ? 'bi-sort-numeric-down' : 'bi-sort-numeric-up';
+                           } else { // itemName
+                               iconClass = sortedDirection === 'asc' ? 'bi-sort-alpha-down' : 'bi-sort-alpha-up';
+                           }
+                           icon.classList.add(iconClass);
+                      } else {
+                           // Default icon for non-sorted columns
+                            let defaultIconClass = 'bi-sort-alpha-down'; // Default text/serial
+                            if (column === 'buyRate' || column === 'calculatedTargetSell' || column === 'sellRate' || column === 'profit' || column === 'serial') {
+                                defaultIconClass = 'bi-sort-numeric-down'; // Default numeric
+                            }
+                           icon.classList.add(defaultIconClass); // Add a default icon
+                      }
+                 });
+             }
+
+
+            // Function to render the table from the productData array (Handles Search Filtering)
+            function renderTable() {
+                // console.log("Rendering table with data:", productData); // Debug rendering
+
+                // Clear current table body
+                dataOutputTableBody.innerHTML = '';
+
+                if (productData.length === 0) {
+                    // Show "No data" row only if productData is empty AND search is not active or clears everything
+                    const searchTerm = searchInput.value.trim();
+                    if (searchTerm === '') {
+                         noDataRow.style.display = 'table-row'; // Show "No data" message
+                         dataOutputTableBody.appendChild(noDataRow); // Ensure it's in the DOM
+                    } else {
+                         noDataRow.style.display = 'none'; // Hide if data is empty but search is active
+                         // Optionally add a "No results found" message here if you prefer
+                    }
+
+                } else {
+                     noDataRow.style.display = 'none'; // Hide "No data" message
+
+
+                    const searchTerm = searchInput.value.toLowerCase().trim(); // Get current search term
+                    let visibleRowCount = 0; // Track how many rows match the filter
+
+                    productData.forEach((product, index) => {
+                        // Filter rows based on search term
+                        const itemName = product.itemName || '';
+                        const buyRate = product.buyRate ? product.buyRate.toFixed(2) : '';
+                        const sellRate = product.sellRate ? product.sellRate.toFixed(2) : '';
+                        const calculatedSell = product.calculatedTargetSell ? product.calculatedTargetSell.toFixed(2) : '';
+                        const serialDisplay = index + 1; // Current serial based on array order
+
+
+                        // Check if any relevant field includes the search term
+                        const rowContent = `${itemName} ${buyRate} ${sellRate} ${calculatedSell} ${serialDisplay}`.toLowerCase(); // Include serial in search
+                        const isMatch = rowContent.includes(searchTerm);
+
+                         // Create row element
+                        const row = document.createElement('tr');
+                        row.setAttribute('data-id', product.id); // Use a unique ID
+                        row.setAttribute('data-search-content', rowContent); // Store search content for efficiency later if needed
+
+                         // Add initial animation class only if a fresh render (e.g., after add/delete, not just filter)
+                         // For simplicity, animation on filter is skipped. Re-adding animation after any render might be too much.
+                         // Consider adding animation only when adding a *new* row dynamically *without* a full re-render.
+
+
+                        // Ensure product properties are valid numbers before displaying
+                         const buyRateDisplay = isNaN(product.buyRate) ? 'N/A' : product.buyRate.toFixed(2);
+                         const calculatedSellDisplay = isNaN(product.calculatedTargetSell) ? 'N/A' : product.calculatedTargetSell.toFixed(2);
+                         const sellRateDisplay = isNaN(product.sellRate) ? 'N/A' : product.sellRate.toFixed(2); // Display the editable sellRate
+                         const profitDisplayHTML = formatProfitCell(product.profit); // Use the formatted HTML
+
+                        // Add data cells
+                        row.innerHTML = `
+                            <td>${serialDisplay}</td> <!-- Serial number based on current index -->
+                            <td class="editable" data-field="itemName">${itemName || 'Unnamed Item'}</td>
+                            <td class="editable" data-field="buyRate">${buyRateDisplay}</td>
+                            <td>${calculatedSellDisplay}</td> <!-- Display calculated suggestion (not editable) -->
+                            <td class="editable" data-field="sellRate">${sellRateDisplay}</td> <!-- Editable Sell Rate -->
+                            <td>${profitDisplayHTML}</td>
+                            <td class="table-actions">
+                                <button class="btn btn-sm btn-danger delete-btn"><i class="bi bi-trash"></i> Delete</button>
+                            </td>
+                        `;
+
+                         // Only append row if it matches the search term
+                        if (isMatch) {
+                             dataOutputTableBody.appendChild(row);
+                             visibleRowCount++;
+                        }
+
+                         // Animation logic - if row was added with .table-row-add class, remove it after animation
+                         // (Assuming animation class is added on the tr element when adding data)
+                         row.addEventListener('animationend', function handler() {
+                             row.removeEventListener('animationend', handler); // Clean up listener
+                             row.classList.remove('table-row-add'); // Ensure class is removed
+                         }, { once: true });
+
+
+                    });
+
+                     // If data exists but no rows matched the search filter
+                    if (visibleRowCount === 0 && searchTerm !== '') {
+                         // Optional: Add a "No results found" message row
+                         const noResultsRow = document.createElement('tr');
+                          noResultsRow.innerHTML = `<td colspan="7" class="text-center text-muted">No results found for "${searchTerm}".</td>`;
+                         dataOutputTableBody.appendChild(noResultsRow);
+                    }
+                }
+                 // Always update total profit and final result list after rendering the FULL data set (not just filtered view)
+                 // Note: Total Profit and Final List should reflect the *entire* data, not just the filtered view,
+                 // unless you explicitly want them to update with the filtered results.
+                 // Let's keep them reflecting the full data for now.
+                 calculateTotalProfit();
+                 updateFinalResultList();
+                 saveData(); // Save state after render ensures serials are correct and data is consistent
+            }
+
+            // Function to add data from the form
+            function addData(event) {
+                event.preventDefault(); // Prevent form submission
+
+                const itemName = itemNameInput.value.trim();
+                const buyRate = parseFloat(buyRateInput.value);
+
+                if (!itemName || isNaN(buyRate) || buyRate < 0) {
+                    alert('Please enter valid Item Name and Buy Rate.'); // Use a better UI notification
+                    return;
+                }
+
+                const calculatedTargetSell = calculateTargetSell(buyRate);
+                const sellRate = calculatedTargetSell; // Initially Your Selling Price is the calculated one
+                const profit = calculateProfit(buyRate, sellRate);
+
+                 // Generate a simple unique ID (more robust than just index)
+                 const id = Date.now() + Math.random().toString(36).substring(2, 15); // Using base 36 for shorter ID
+
+                const newData = {
+                    id: id, // Unique ID for editing/deleting
+                    // Serial number will be assigned during render
+                    itemName: itemName,
+                    buyRate: buyRate,
+                    calculatedTargetSell: calculatedTargetSell,
+                    sellRate: sellRate, // This is the user editable one, initially set to calculated
+                    profit: profit // Initial profit
+                };
+
+                productData.push(newData);
+                // console.log("Data added:", newData); // Debug
+                // After adding, sort by serial ascending by default and re-render
+                currentSortColumn = 'serial'; // Reset sort after adding
+                currentSortDirection = 'asc';
+                sortTable(currentSortColumn, currentSortDirection); // Sorts and calls renderTable
+
+                // Clear the form and reset focus
+                productDataForm.reset();
+                itemNameInput.focus();
+            }
+
+             // --- Function to handle saving edits from an editable cell ---
+             function saveEditedCell(cell) {
+                 // Ensure the cell is still the one being edited (important if multiple edits attempted quickly)
+                  if (!cell || !cell.classList.contains('editing')) {
+                     // console.warn("saveEditedCell called on non-editing cell.");
+                     return; // Do nothing if cell is not in an editing state
+                  }
+
+                 // Turn off contenteditable and remove editing class FIRST
+                 cell.contentEditable = false;
+                 cell.classList.remove('editing');
+
+                 const row = cell.closest('tr');
+                 const field = cell.getAttribute('data-field');
+                 const newValue = cell.textContent.trim();
+                 const originalValue = cell.getAttribute('data-original-value'); // Get original string value
+                 const rowId = row.getAttribute('data-id');
+
+                  cell.removeAttribute('data-original-value'); // Clean up attribute
+
+
+                  // Find the product data object by its unique ID
+                 const productIndex = productData.findIndex(p => p.id === rowId);
+                 if (productIndex === -1) {
+                     console.error("Row data not found for ID:", rowId);
+                     // Revert cell content if data object is missing or ID not found
+                     cell.textContent = originalValue;
+                     return;
+                 }
+
+                 let product = productData[productIndex]; // Get reference to the actual object
+                 let updated = false; // Flag to see if anything meaningful changed
+
+                  // console.log(`[EDITING] Saving edit for ID: ${rowId}, Field: ${field}, New Value: "${newValue}", Original Value: "${originalValue}"`); // Debugging
+
+                  // --- Update the specific field ---
+                  if (field === 'itemName') {
+                      if (newValue !== originalValue) {
+                          product.itemName = newValue;
+                          updated = true;
+                           // console.log("[EDITING] Item Name updated:", product.itemName); // Debug
+                      } else {
+                           // If no change, just revert the display to original string value (handles leading/trailing spaces)
+                          cell.textContent = originalValue;
+                      }
+                  } else if (field === 'buyRate' || field === 'sellRate') {
+                      // For numeric fields, parse the new value
+                      const newNumericValue = parseFloat(newValue);
+                      // We need the original numeric value for comparison and fallback
+                      const originalNumericValue = parseFloat(originalValue);
+
+
+                      if (!isNaN(newNumericValue) && newNumericValue >= 0) { // Check if new input is a valid non-negative number
+                          // Check if the numeric value actually changed (comparing numbers).
+                          // Comparing fixed versions is often safer than direct float comparison.
+                          const numericValueChanged = newNumericValue.toFixed(2) !== originalNumericValue.toFixed(2);
+
+                          if (field === 'buyRate') {
+                              if (numericValueChanged) {
+                                  product.buyRate = newNumericValue; // Update buyRate in the object
+                                  // Recalculate Calculated Target Sell based on new Buy Rate
+                                  product.calculatedTargetSell = calculateTargetSell(product.buyRate);
+                                  // Recalculate Profit based on new Buy Rate and *current* Sell Rate
+                                  product.profit = calculateProfit(product.buyRate, product.sellRate); // Pass numeric values
+                                  updated = true;
+                                   // console.log("[EDITING] Buy Rate updated to:", product.buyRate, "New Profit:", product.profit); // Debug
+                              } else {
+                                   // Value didn't change numerically, just ensure display format is correct
+                                  cell.textContent = originalNumericValue.toFixed(2);
+                              }
+                          } else if (field === 'sellRate') { // Editing "Your Selling Price"
+                              if (numericValueChanged) {
+                                  product.sellRate = newNumericValue; // Update sellRate in the object
+                                  // Recalculate Profit based on new Sell Rate and *current* Buy Rate
+                                  product.profit = calculateProfit(product.buyRate, product.sellRate); // Pass numeric values
+                                  updated = true;
+                                   // console.log("[EDITING] Sell Rate updated to:", product.sellRate, "New Profit:", product.profit); // Debug
+                              } else {
+                                    // Value didn't change numerically, just ensure display format is correct
+                                   cell.textContent = originalNumericValue.toFixed(2);
+                               }
+                          }
+                      } else {
+                          // If input is invalid (not a non-negative number)
+                          alert(`Invalid input for ${field === 'buyRate' ? 'Buy Rate' : 'Your Selling Price'}. Please enter a valid non-negative number.`);
+                          // Revert display to original value, formatted if it was a number
+                          const originalNum = parseFloat(originalValue);
+                           cell.textContent = !isNaN(originalNum) ? originalNum.toFixed(2) : originalValue; // Revert, try formatting if was number
+                      }
+                  }
+
+                  // --- If data was updated, update UI and save ---
+                  if (updated) {
+                      // Update the specific row's display in the table with potentially new calculated fields and profit
+                      updateRowInTable(row, product); // This updates the row's display in the HTML table
+
+                      // Update derived UI elements that depend on the whole dataset
+                      calculateTotalProfit(); // Recalculate and update total profit display
+                      updateFinalResultList(); // Regenerate and update the final list textarea
+
+                      saveData(); // Save updated productData array to Local Storage
+                       // console.log("[EDITING] Data saved after update. Full data:", productData); // Debug
+                  } else {
+                       // If no update happened (e.g., invalid input or value didn't change), ensure cell display is correct
+                       // This is handled inside the field-specific blocks above for better control.
+                       // Just ensure focus is removed properly.
+                  }
+             }
+
+
+            // Function to update a specific row's display after data change
+            function updateRowInTable(rowElement, product) {
+                // console.log("[UI UPDATE] Updating row display for product:", product); // Debug
+                const cells = rowElement.querySelectorAll('td');
+                // Cells[0] is Serial No, auto-updated by renderTable
+
+                 // Ensure product properties are valid numbers before displaying
+                 const buyRateDisplay = isNaN(product.buyRate) ? 'N/A' : product.buyRate.toFixed(2);
+                 const calculatedSellDisplay = isNaN(product.calculatedTargetSell) ? 'N/A' : product.calculatedTargetSell.toFixed(2);
+                 const sellRateDisplay = isNaN(product.sellRate) ? 'N/A' : product.sellRate.toFixed(2); // Display the editable sellRate
+
+                 // Use the formatProfitCell function to get the HTML string with color
+                 const profitDisplayHTML = formatProfitCell(product.profit); // Use the profit value from the product object
+
+
+                cells[1].textContent = product.itemName || 'Unnamed Item';
+                cells[2].textContent = buyRateDisplay;
+                cells[3].textContent = calculatedSellDisplay; // Update calculated suggestion
+                cells[4].textContent = sellRateDisplay; // Update editable sell rate
+                cells[5].innerHTML = profitDisplayHTML; // Update profit with color (using innerHTML)
+
+                // console.log("[UI UPDATE] Row display updated."); // Debug
+            }
+
+
+            // Function to handle delete (using event delegation)
+            dataOutputTableBody.addEventListener('click', (event) => {
+                const target = event.target;
+                // Check if the clicked element is a delete button or its icon
+                if (target.closest('.delete-btn')) { // Use closest to handle clicks on icon inside button
+                     const button = target.closest('.delete-btn');
+                     const row = button.closest('tr');
+                     const rowId = row.getAttribute('data-id');
+
+                     // Prevent deletion if a cell in this row is currently being edited
+                      if (row.querySelector('.editing')) {
+                           // console.log("Cannot delete row while editing a cell.");
+                           alert("Please finish editing the cell before deleting the row."); // User feedback
+                           return;
+                      }
+
+
+                     if (confirm('Are you sure you want to delete this item?')) {
+                         // Find the index and remove from the array FIRST
+                          const productIndex = productData.findIndex(p => p.id === rowId);
+                          if (productIndex > -1) {
+                               productData.splice(productIndex, 1);
+                              // console.log("Item deleted. New data:", productData); // Debug
+
+                              // Add animation class before removing from DOM
+                              row.classList.add('table-row-remove');
+                               // Use a short timeout to allow animation and then remove from DOM and re-render
+                                setTimeout(() => { // Simple timeout approach
+                                    // Remove row from DOM after timeout
+                                    if (row.parentNode) { // Check if row is still in DOM
+                                        row.parentNode.removeChild(row);
+                                    }
+                                     // Re-render the table to update serials, total, list etc. (calls saveData)
+                                     // This also clears and rebuilds the table, which handles the removal robustly.
+                                     renderTable();
+                               }, 500); // Match animation duration (0.5s)
+
+                         }
+                     }
+                 }
+            });
+
+            // Function to handle search filtering
+            function handleSearch() {
+                 const searchTerm = searchInput.value.toLowerCase().trim();
+                 const rows = dataOutputTableBody.querySelectorAll('tr');
+
+                 rows.forEach(row => {
+                      // Don't hide the "No data" row if it's visible
+                      if (row.id === 'no-data-row') {
+                           // Keep it visible only if list is empty AND search is clear
+                           if (productData.length === 0 && searchTerm === '') { // Only show "No data" if list is empty AND no search term
+                                row.style.display = 'table-row';
+                           } else {
+                                // Hide if there is data or if search is active
+                                row.style.display = 'none';
+                           }
+                          return; // Skip further processing for this row
+                      }
+
+
+                      const rowContent = row.getAttribute('data-search-content') || row.textContent.toLowerCase();
+                      const isMatch = rowContent.includes(searchTerm);
+
+                      row.style.display = isMatch ? '' : 'none'; // Show or hide row
+
+                 });
+
+                 // Re-check if "No data" row needs to be shown if search clears everything
+                 const visibleDataRows = Array.from(rows).filter(row => row.style.display !== 'none' && row.id !== 'no-data-row');
+                 if (visibleDataRows.length === 0 && productData.length > 0 && searchTerm !== '') {
+                      // If data exists but no rows match search, the table body will be empty except potentially the hidden #no-data-row.
+                      // The lack of visible rows indicates no results.
+                      // console.log("No search results found."); // Debug
+                 } else if (productData.length === 0 && searchTerm === '') {
+                      // Ensure "No data" is visible if list is empty and search is clear
+                       noDataRow.style.display = 'table-row';
+                 }
+
+                 // Note: Total Profit and Final List are NOT updated by search filter, they show totals for all data.
+            }
+
+             // Function to export data as CSV
+            function exportCsv() {
+                if (productData.length === 0) {
+                    alert("No data to export.");
+                    return;
+                }
+
+                let csvContent = "Serial No.,Item Name,Buy Rate (৳),Calculated Target Sell (৳),Your Selling Price (৳),Profit (৳)\n"; // CSV Header
+
+                 productData.forEach((product, index) => {
+                     const serial = index + 1;
+                     // Escape double quotes within fields by doubling them
+                     const itemName = `"${product.itemName ? product.itemName.replace(/"/g, '""') : ''}"`;
+                     const buyRate = isNaN(product.buyRate) ? '0.00' : product.buyRate.toFixed(2);
+                     const calculatedSell = isNaN(product.calculatedTargetSell) ? '0.00' : product.calculatedTargetSell.toFixed(2);
+                     const sellRate = isNaN(product.sellRate) ? '0.00' : product.sellRate.toFixed(2);
+                     const profit = isNaN(product.profit) ? '0.00' : product.profit.toFixed(2);
+
+                     csvContent += `${serial},${itemName},${buyRate},${calculatedSell},${sellRate},${profit}\n`;
+                 });
+
+                // Create a Blob and trigger download
+                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                 const link = document.createElement('a');
+                 const url = URL.createObjectURL(blob);
+
+                 link.setAttribute('href', url);
+                 link.setAttribute('download', 'youtube_premium_market_analysis_data.csv'); // Filename
+
+                 link.style.visibility = 'hidden'; // Hide the link
+                 document.body.appendChild(link); // Add to DOM temporarily
+                 link.click(); // Simulate click
+
+                 document.body.removeChild(link); // Clean up
+                 URL.revokeObjectURL(url); // Release the object URL
+            }
+
+
+            // Function to copy competitor link
+            function copyCompetitorLink(event) {
+                const button = event.target.closest('.copy-btn');
+                if (!button) return; // Check if the actual button was clicked or icon inside it
+
+                const url = button.getAttribute('data-url');
+
+                if (url) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        // Provide visual feedback
+                        const originalIconHTML = button.innerHTML; // Get original icon HTML
+                         button.innerHTML = '<i class="bi bi-check-lg"></i> Copied!'; // Change to check icon and text
+                        // Temporarily change button style
+                        button.classList.remove('btn-outline-primary');
+                        button.classList.add('btn-success');
+
+                        setTimeout(() => {
+                            button.innerHTML = originalIconHTML; // Revert to original icon and text
+                            // Revert button style
+                            button.classList.remove('btn-success');
+                             button.classList.add('btn-outline-primary');
+                        }, 1500); // Reset button after 1.5 seconds
+                    }).catch(err => {
+                        console.error('Failed to copy competitor link: ', err);
+                        alert('Failed to copy the link.'); // Use a better UI notification
+                    });
+                }
+            }
+
+             // Function to copy the final result list
+            function copyFinalResultList() {
+                const listText = finalResultOutput.value;
+                if (!listText.trim()) {
+                    // Show feedback for nothing to copy
+                     copyFeedbackSpan.textContent = " Nothing to copy!"; // Space for icon
+                     copyFeedbackSpan.classList.remove('text-success');
+                     copyFeedbackSpan.classList.add('text-danger');
+                     copyFeedbackSpan.style.display = 'inline';
+                      // Remove existing icon if any
+                      const existingIcon = copyFeedbackSpan.querySelector('.bi-check-lg');
+                       if(existingIcon) existingIcon.remove();
+
+                      setTimeout(() => {
+                         copyFeedbackSpan.style.display = 'none';
+                          copyFeedbackSpan.classList.remove('text-danger');
+                           copyFeedbackSpan.classList.add('text-success');
+                      }, 2000);
+                    return;
+                }
+
+                 navigator.clipboard.writeText(listText).then(() => {
+                     // Show success feedback
+                     copyFeedbackSpan.textContent = " Copied!"; // Space for icon
+                     copyFeedbackSpan.style.display = 'inline';
+                     copyFeedbackSpan.classList.remove('text-danger'); // Ensure green color
+                     copyFeedbackSpan.classList.add('text-success');
+
+                     // Add check icon (if not already part of the span)
+                     if (!copyFeedbackSpan.querySelector('.bi-check-lg')) {
+                          const icon = document.createElement('i');
+                           icon.classList.add('bi', 'bi-check-lg');
+                           copyFeedbackSpan.prepend(icon); // Add icon before text
+                     }
+
+                     setTimeout(() => {
+                         copyFeedbackSpan.style.display = 'none';
+                          // Remove the icon after hiding
+                          const icon = copyFeedbackSpan.querySelector('.bi-check-lg');
+                           if(icon) icon.remove();
+                     }, 2000); // Hide feedback after 2 seconds
+                 }).catch(err => {
+                     console.error('Failed to copy list: ', err);
+                      // Show error feedback
+                      copyFeedbackSpan.textContent = " Failed to copy!"; // Space for icon
+                      copyFeedbackSpan.classList.remove('text-success');
+                      copyFeedbackSpan.classList.add('text-danger');
+                      copyFeedbackSpan.style.display = 'inline';
+                       // Remove existing icon if any
+                       const existingIcon = copyFeedbackSpan.querySelector('.bi-check-lg');
+                        if(existingIcon) existingIcon.remove();
+
+                       setTimeout(() => {
+                         copyFeedbackSpan.style.display = 'none';
+                          copyFeedbackSpan.classList.remove('text-danger');
+                           copyFeedbackSpan.classList.add('text-success');
+                      }, 2000);
+                 });
+            }
+
+
+            // Function to load URL in iframe
+            function loadIframe() {
+                let url = iframeUrlInput.value.trim();
+
+                if (!url) {
+                    alert('Please enter a URL.'); // Use a better UI notification
+                    return;
+                }
+
+                // Add https:// if missing and not already http:// or https://
+                if (!url.match(/^[a-zA-Z]+:\/\//)) {
+                    url = 'https://' + url;
+                }
+
+                // Basic check for valid URL format
+                 try {
+                    new URL(url);
+                 } catch (_) {
+                     alert('Please enter a valid URL.'); // Use a better UI notification
+                     return;
+                 }
+
+                // Note: iframe sandbox attribute added in HTML for basic security
+
+                websiteIframe.src = url;
+
+                 // Optional: Add loading indicator or handle iframe load errors
+                 // websiteIframe.onload = () => { console.log("Iframe loaded successfully"); };
+                 // websiteIframe.onerror = () => { console.error("Iframe failed to load"); };
+            }
+
+            // Function to save analysis data to Local Storage
+            function saveData() {
+                 // Serial numbers are implicitly handled by renderTable based on array index
+                 try {
+                    localStorage.setItem(productDataStorageKey, JSON.stringify(productData));
+                    // console.log("Analysis data saved."); // Debugging/Feedback
+                 } catch (e) {
+                     console.error("Error saving data to Local Storage:", e);
+                     // Optional: Alert user if storage is full
+                     // if (e.name === 'QuotaExceededError') { alert('Local storage is full.'); }
+                 }
+            }
+
+            // Function to load analysis data from Local Storage
+            function loadData() {
+                const savedData = localStorage.getItem(productDataStorageKey);
+
+                if (savedData) {
+                    try {
+                         productData = JSON.parse(savedData);
+                         // Ensure loaded data has all necessary fields and recalculate derived fields
+                         // This helps with backwards compatibility if data structure changes or is corrupted
+                         productData.forEach(item => {
+                             // Ensure numeric fields are numbers, default to 0 if invalid
+                             item.buyRate = parseFloat(item.buyRate) || 0;
+                             item.sellRate = parseFloat(item.sellRate) || 0; // Ensure sellRate is number
+                             item.itemName = item.itemName || 'Unnamed Item';
+                             // Recalculate calculatedTargetSell based on buyRate
+                             item.calculatedTargetSell = calculateTargetSell(item.buyRate);
+                             // Recalculate profit based on current buyRate and sellRate
+                             item.profit = calculateProfit(item.buyRate, item.sellRate); // Pass numeric values
+                             // Ensure id exists (for deletion/editing) - if not, generate one (less ideal for old data, but needed)
+                             if (!item.id) item.id = Date.now() + Math.random().toString(36).substring(2, 15);
+                         });
+
+                         // Filter out any potentially invalid items (e.g., from corrupted storage)
+                         productData = productData.filter(item =>
+                              item && typeof item.buyRate === 'number' && typeof item.sellRate === 'number' && typeof item.itemName === 'string' && item.id // Basic validation
+                         );
+
+                    } catch (e) {
+                         console.error("Error loading or parsing data from Local Storage:", e);
+                         productData = []; // Clear data if loading fails
+                         alert("Error loading saved analysis data. It might be corrupted. Starting with empty data."); // User feedback
+                    }
+
+                } else {
+                    productData = []; // Start with empty array if no data found
+                }
+
+                 // Render the table and update related UI elements based on loaded data
+                 // Don't call renderTable directly, use sortTable with default sort
+                 sortTable(currentSortColumn, currentSortDirection); // Sorts and calls renderTable
+            }
+
+            // Function to reset all analysis data
+            function resetAllData() {
+                if (confirm('Are you sure you want to delete ALL market analysis data? This cannot be undone.')) {
+                    localStorage.removeItem(productDataStorageKey);
+                    productData = [];
+                    // Reset sort state
+                     currentSortColumn = 'serial';
+                     currentSortDirection = 'asc';
+                    renderTable(); // Re-render empty table (calls saveData)
+                    alert('All analysis data has been reset.'); // Use a better UI notification
+                }
+            }
+
+            // Function to print all visible content
+            function printData() {
+                 window.print(); // Triggers the browser's print dialog. @media print CSS handles appearance.
+            }
+
+
+            // --- Event Listeners ---
+            productDataForm.addEventListener('submit', addData);
+            loadIframeBtn.addEventListener('click', loadIframe);
+            resetDataBtn.addEventListener('click', resetAllData);
+            printDataBtn.addEventListener('click', printData); // Print button listener
+            searchInput.addEventListener('input', handleSearch); // Search input listener
+            exportCsvBtn.addEventListener('click', exportCsv); // Export button listener
+
+            // Event listener for table headers to handle sorting
+             tableHeaders.forEach(header => {
+                 header.addEventListener('click', () => {
+                      const column = header.getAttribute('data-sort');
+                      if (!column) return; // Only sortable headers have data-sort
+
+                      // Determine the new sort direction
+                      if (currentSortColumn === column) {
+                           currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                      } else {
+                           currentSortColumn = column;
+                           currentSortDirection = 'asc'; // Default to ascending for new column
+                      }
+
+                      // Sort the data and re-render the table
+                      sortTable(currentSortColumn, currentSortDirection);
+
+                      // Update sort icons
+                      updateSortIcons(currentSortColumn, currentSortDirection);
+                 });
+             });
+
+
+            // Event listeners for copy buttons (using event delegation on the parent)
+            competitorList.addEventListener('click', (event) => {
+                 if (event.target.closest('.copy-btn')) { // Use closest to handle clicks on icon inside button
+                    copyCompetitorLink(event);
+                 }
+            });
+
+            // Event listener for copy final result button
+            copyResultBtn.addEventListener('click', copyFinalResultList);
+
+
+            // Add event listener for iframe input to allow loading with Enter key
+             iframeUrlInput.addEventListener('keypress', (e) => {
+                 if (e.key === 'Enter') {
+                     e.preventDefault(); // Prevent form submission if within a form
+                     loadIframe();
+                 }
+             });
+
+            // --- Calculator Event Listeners ---
+             calcButtons.forEach(button => {
+                 button.addEventListener('click', () => {
+                     const number = button.dataset.number;
+                     const operatorValue = button.dataset.operator;
+                     const decimal = button.dataset.decimal;
+                     const clear = button.classList.contains('clear');
+                     const allClear = button.classList.contains('all-clear');
+                     const equals = button.classList.contains('equals');
+
+
+                     if (number !== undefined) {
+                         handleNumber(number);
+                     } else if (operatorValue !== undefined) {
+                          handleOperator(operatorValue);
+                     } else if (decimal !== undefined) {
+                         handleDecimal(decimal);
+                     } else if (equals) {
+                         handleEquals();
+                     } else if (allClear) {
+                         resetCalculator();
+                     } else if (clear) {
+                         clearLastInput();
+                     }
+                 });
+             });
+
+            // Allow keyboard input for calculator (Optional, adds complexity)
+            // document.addEventListener('keydown', (e) => { /* ... keyboard logic ... */ });
+
+
+            // --- Notepad Event Listeners ---
+            notepadTextarea.addEventListener('input', saveNotepad); // Autosave on input
+            clearNotepadBtn.addEventListener('click', clearNotepad);
+
+            // --- Initial Load ---
+             loadData(); // Load analysis data, sorts, renders table, total profit, and result list
+             loadNotepad(); // Load notepad content
+             updateCalcDisplay(); // Initialize calculator display
+             // updateSortIcons(currentSortColumn, currentSortDirection); // Initial icon update
+
+        });
+    </script>
+
+</body>
+</html>
